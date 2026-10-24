@@ -4,12 +4,12 @@ Projeto desenvolvido para a obtenção do **Nível 1 (BMVC I)** da disciplina de
 
 ---
 
-## 🎯 Propósito do Projeto
+##  Propósito do Projeto
 Aplicação web responsiva para controle financeiro pessoal. Permite gerenciar receitas e despesas, calcular automaticamente o saldo consolidado, classificar lançamentos por categorias, visualizar a distribuição percentual de gastos e filtrar histórico por tipo ou busca textual.
 
 ---
 
-## 🏗️ Arquitetura do Projeto (Padrão MVC)
+##  Arquitetura do Projeto (Padrão MVC)
 
 - **Rotas (`route.py`):** Configuração do servidor Bottle, roteamento da URL raiz `/` e `/despesas` e entrega de arquivos estáticos (`/static/<filepath:path>`).
 - **Controller (`app/controllers/application.py`):** Controlador `Application` responsável pela lógica de renderização dos templates.
@@ -20,7 +20,7 @@ Aplicação web responsiva para controle financeiro pessoal. Permite gerenciar r
 
 ---
 
-## 🚀 Como Executar
+##  Como Executar
 
 ### Opção 1: Diretamente com Python (Local)
 
