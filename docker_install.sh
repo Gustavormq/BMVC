@@ -11,7 +11,7 @@ fi
 # Atualizar lista de pacotes
 apt update
 
-# Instalar dependências para usar repositório HTTPS e o Vim
+# Instalar dependências para usar repositório HTTPS e o Vim 
 apt install -y \
     apt-transport-https \
     ca-certificates \
