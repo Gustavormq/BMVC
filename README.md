@@ -1,26 +1,45 @@
-# BMVC Finance · Controle de Despesas Pessoais (BMVC I)
+# BMVC Finance · Controle de Despesas Pessoais (Bottle + MVC)
 
-Projeto desenvolvido para a obtenção do **Nível 1 (BMVC I)** da disciplina de Orientação a Objetos / Desenvolvimento FullStack, utilizando o padrão arquitetural **BMVC (Bottle + MVC)**.
-
----
-
-##  Propósito do Projeto
-Aplicação web responsiva para controle financeiro pessoal. Permite gerenciar receitas e despesas, calcular automaticamente o saldo consolidado, classificar lançamentos por categorias, visualizar a distribuição percentual de gastos e filtrar histórico por tipo ou busca textual.
+Projeto completo desenvolvido utilizando o padrão arquitetural **BMVC (Bottle + Model-View-Controller)** para gerenciamento de finanças pessoais (receitas e despesas).
 
 ---
 
-##  Arquitetura do Projeto (Padrão MVC)
-
-- **Rotas (`route.py`):** Configuração do servidor Bottle, roteamento da URL raiz `/` e `/despesas` e entrega de arquivos estáticos (`/static/<filepath:path>`).
-- **Controller (`app/controllers/application.py`):** Controlador `Application` responsável pela lógica de renderização dos templates.
-- **View (`app/views/html/despesas.tpl`):** Interface visual estruturada com cards de resumo financeiro, formulário de lançamentos e tabela de extrato.
-- **Assets Estáticos (`app/static/`):**
-  - `css/despesas.css`: Estilização moderna, responsiva, com tema escuro (Dark Mode).
-  - `js/despesas.js`: Script frontend interativo (validação de formulário, cálculos dinâmicos de saldo e porcentagem de categorias, persistência em LocalStorage e notificações toast).
+## Propósito do Projeto
+Aplicação web responsiva para controle financeiro pessoal. Permite gerenciar receitas e despesas com persistência em backend JSON (`DataRecord`), calcular automaticamente o saldo consolidado, editar e excluir lançamentos, classificar por categorias, visualizar gráficos interativos (pizza e evolução temporal), filtrar histórico por período, categoria, tipo ou busca textual e exportar os dados em CSV.
 
 ---
 
-##  Como Executar
+## Arquitetura do Projeto (Padrão MVC)
+
+```text
+bmvc_start_from_this/
+├── route.py                         # Roteamento Bottle (Páginas, Ações CRUD, CSV e API JSON)
+├── Dockerfile                       # Imagem Docker da aplicação
+├── bmvc_setup.sh                    # Script de build e execução do container
+├── docker_install.sh                # Script auxiliar de instalação do Docker
+└── app/
+    ├── models/
+    │   └── expense.py               # Model Expense (entidade de lançamento financeiro)
+    ├── controllers/
+    │   ├── application.py           # Controller Application (regras de negócio e renderização)
+    │   ├── datarecord.py            # Persistência de objetos Expense em banco JSON
+    │   └── db/
+    │       └── expenses.json        # Base de dados JSON persistente
+    ├── views/
+    │   └── html/
+    │       ├── despesas.tpl         # View principal (painel, filtros, tabela e gráficos)
+    │       ├── editar_despesa.tpl   # View de edição de lançamento
+    │       └── helper.tpl           # View auxiliar do template BMVC
+    └── static/
+        ├── css/
+        │   └── despesas.css         # Estilização responsiva Dark Mode
+        └── js/
+            └── despesas.js          # Interatividade frontend, filtros, Chart.js e sync REST
+```
+
+---
+
+## Como Executar
 
 ### Opção 1: Diretamente com Python (Local)
 
@@ -29,7 +48,7 @@ Aplicação web responsiva para controle financeiro pessoal. Permite gerenciar r
    pip install bottle
    ```
 
-2. Execute o servidor na raiz do projeto:
+2. Execute o servidor na raiz do projeto (`bmvc_start_from_this`):
    ```bash
    python route.py
    ```
@@ -41,15 +60,15 @@ Aplicação web responsiva para controle financeiro pessoal. Permite gerenciar r
 
 ### Opção 2: Com Docker
 
-1. Construir a imagem Docker:
+1. Construir e executar usando o script:
    ```bash
-   docker build -t bmvci .
+   ./bmvc_setup.sh
+   ```
+   Ou manualmente:
+   ```bash
+   docker build -t bmetimg .
+   docker run --name bmetaap -p 8080:8080 -v $(pwd):/bmeta bmetimg
    ```
 
-2. Executar o contêiner:
-   ```bash
-   docker run -d -p 8080:8080 -v $(pwd):/app bmvci
-   ```
-
-3. Acesse em:
+2. Acesse em:
    [http://localhost:8080](http://localhost:8080)

@@ -7,8 +7,7 @@ if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
 from app.controllers.application import Application
-from bottle import Bottle, route, run, request, static_file
-from bottle import redirect, template, response, TEMPLATE_PATH
+from bottle import Bottle, run, static_file, TEMPLATE_PATH
 
 views_path = os.path.join(BASE_DIR, 'app', 'views', 'html')
 if views_path not in TEMPLATE_PATH:
@@ -21,7 +20,7 @@ ctl = Application()
 
 
 #-----------------------------------------------------------------------------
-# Rotas:
+# Rotas Estáticas e Helper:
 
 @app.route('/static/<filepath:path>')
 def serve_static(filepath):
@@ -34,17 +33,59 @@ def helper(info=None):
 
 
 #-----------------------------------------------------------------------------
-# Suas rotas aqui:
+# Rotas da Aplicação (Páginas e Ações MVC):
 
-@app.route('/')
-@app.route('/despesas')
+@app.route('/', method='GET')
+@app.route('/despesas', method='GET')
 def despesas():
     return ctl.render('despesas')
+
+@app.route('/add', method='POST')
+def add_expense():
+    return ctl.add_expense()
+
+@app.route('/edit/<expense_id:int>', method='GET')
+def edit_expense(expense_id):
+    return ctl.render('editar_despesa', expense_id=expense_id)
+
+@app.route('/edit/<expense_id:int>', method='POST')
+def update_expense(expense_id):
+    return ctl.update_expense(expense_id)
+
+@app.route('/delete/<expense_id:int>', method='POST')
+def delete_expense(expense_id):
+    return ctl.delete_expense(expense_id)
+
+@app.route('/export', method='GET')
+def export_csv():
+    return ctl.export_csv()
+
+
+#-----------------------------------------------------------------------------
+# Rotas de API REST/JSON (Sincronização com o Frontend Interativo):
+
+@app.route('/api/transactions', method='GET')
+def api_list():
+    return ctl.api_list()
+
+@app.route('/api/transactions', method='POST')
+def api_create():
+    return ctl.api_create()
+
+@app.route('/api/transactions/<expense_id:int>', method='PUT')
+def api_update(expense_id):
+    return ctl.api_update(expense_id)
+
+@app.route('/api/transactions/<expense_id:int>', method='DELETE')
+def api_delete(expense_id):
+    return ctl.api_delete(expense_id)
+
+@app.route('/api/reset', method='POST')
+def api_reset():
+    return ctl.api_reset()
 
 
 #-----------------------------------------------------------------------------
 
-
 if __name__ == '__main__':
-
     run(app, host='0.0.0.0', port=8080, debug=True)

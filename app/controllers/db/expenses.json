@@ -1,0 +1,75 @@
+[
+    {
+        "id": 1,
+        "type": "receita",
+        "description": "Salário Mensal",
+        "amount": 4500.0,
+        "category": "Salário",
+        "date": "2026-10-05"
+    },
+    {
+        "id": 2,
+        "type": "despesa",
+        "description": "Aluguel do Apartamento",
+        "amount": 1500.0,
+        "category": "Moradia",
+        "date": "2026-10-10"
+    },
+    {
+        "id": 3,
+        "type": "despesa",
+        "description": "Compras Supermercado",
+        "amount": 620.5,
+        "category": "Alimentação",
+        "date": "2026-10-12"
+    },
+    {
+        "id": 4,
+        "type": "despesa",
+        "description": "Abastecimento Carro",
+        "amount": 250.0,
+        "category": "Transporte",
+        "date": "2026-10-15"
+    },
+    {
+        "id": 5,
+        "type": "despesa",
+        "description": "Cinema e Jantar",
+        "amount": 180.0,
+        "category": "Lazer",
+        "date": "2026-10-18"
+    },
+    {
+        "id": 6,
+        "type": "receita",
+        "description": "Projeto Freelance",
+        "amount": 800.0,
+        "category": "Salário",
+        "date": "2026-10-20"
+    },
+    {
+        "id": 7,
+        "type": "despesa",
+        "description": "Farmácia / Remédios",
+        "amount": 95.4,
+        "category": "Saúde",
+        "date": "2026-10-22"
+    },
+    {
+        "id": 8,
+        "type": "despesa",
+        "description": "Mercado",
+        "amount": 250.0,
+        "category": "Alimentação",
+        "date": "2026-08-17"
+    },
+    {
+        "id": 9,
+        "type": "despesa",
+        "description": "Carro",
+        "amount": 320.0,
+        "category": "Transporte",
+        "date": "2026-08-15"
+    }
+]
+
