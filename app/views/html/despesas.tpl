@@ -25,9 +25,21 @@
                 <a href="/export" class="btn btn-sm btn-outline" title="Exportar todos os lançamentos em CSV">
                     📥 Exportar CSV
                 </a>
+                % if defined('current_user') and current_user:
+                <div class="header-badge">
+                    <span class="status-dot"></span> 👤 {{current_user.username}}
+                </div>
+                <form action="/logout" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-outline" title="Sair da conta">🚪 Sair</button>
+                </form>
+                % else:
+                <a href="/portal" class="btn btn-sm btn-outline" title="Acessar Portal de Login (Nível 3)">
+                    🔐 Login / Portal
+                </a>
                 <div class="header-badge">
                     <span class="status-dot"></span> Servidor Ativo (Bottle MVC)
                 </div>
+                % end
             </div>
         </div>
     </header>

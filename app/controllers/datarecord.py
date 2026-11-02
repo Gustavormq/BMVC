@@ -1,14 +1,17 @@
 import json
 import os
+import uuid
 from datetime import datetime
 from app.models.expense import Expense
+from app.models.user_account import UserAccount
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 DB_FILE = os.path.join(BASE_DIR, 'app', 'controllers', 'db', 'expenses.json')
+USERS_DB_FILE = os.path.join(BASE_DIR, 'app', 'controllers', 'db', 'user_accounts.json')
 
 
 class DataRecord:
-    """Banco de dados JSON para o recurso de Despesas/Lançamentos (Padrão BMVC)."""
+    """Banco de dados JSON para os recursos de Usuários e Despesas/Lançamentos (Padrão BMVC Níveis 2 a 4)."""
 
     DEFAULT_RECORDS = [
         {"id": 1, "type": "receita", "description": "Salário Mensal", "amount": 4500.00, "category": "Salário", "date": "2026-10-05"},
@@ -24,8 +27,86 @@ class DataRecord:
 
     def __init__(self):
         self.__expenses = []
+        self.__user_accounts = []
+        self.__authenticated_users = {}
         self.read()
+        self.read_users()
 
+    # -------------------------------------------------------------------------
+    # Gerenciamento de Contas de Usuário e Sessões (Níveis 2 e 3)
+    # -------------------------------------------------------------------------
+    def read_users(self):
+        try:
+            with open(USERS_DB_FILE, "r", encoding="utf-8") as f:
+                user_data = json.load(f)
+                self.__user_accounts = [UserAccount(**data) for data in user_data]
+        except (FileNotFoundError, json.JSONDecodeError):
+            self.__user_accounts = [
+                UserAccount("gustavo", "123456", "admin"),
+                UserAccount("Henrique", "123456", "admin"),
+                UserAccount("Moura", "456789", "user")
+            ]
+            self.write_users()
+
+    def write_users(self):
+        os.makedirs(os.path.dirname(USERS_DB_FILE), exist_ok=True)
+        with open(USERS_DB_FILE, "w", encoding="utf-8") as f:
+            json.dump(
+                [u.to_dict() for u in self.__user_accounts],
+                f,
+                ensure_ascii=False,
+                indent=4
+            )
+
+    def book_user(self, username, password, role="user"):
+        for u in self.__user_accounts:
+            if u.username.lower() == username.strip().lower():
+                return None
+        new_user = UserAccount(username, password, role)
+        self.__user_accounts.append(new_user)
+        self.write_users()
+        return new_user
+
+    def getCurrentUser(self, session_id):
+        if session_id in self.__authenticated_users:
+            return self.__authenticated_users[session_id]
+        return None
+
+    def getUserName(self, session_id):
+        if session_id in self.__authenticated_users:
+            return self.__authenticated_users[session_id].username
+        return None
+
+    def getUserSessionId(self, username):
+        for session_id, user in self.__authenticated_users.items():
+            if username == user.username:
+                return session_id
+        return None
+
+    def checkUser(self, username, password):
+        for user in self.__user_accounts:
+            if user.username == username and user.password == password:
+                session_id = str(uuid.uuid4())
+                self.__authenticated_users[session_id] = user
+                return session_id
+        return None
+
+    def logout(self, session_id):
+        if session_id in self.__authenticated_users:
+            del self.__authenticated_users[session_id]
+
+    def work_with_parameter(self, parameter):
+        try:
+            index = int(parameter)
+            if 0 <= index < len(self.__expenses):
+                return self.__expenses[index]
+        except (ValueError, IndexError):
+            return None
+        return None
+
+    # -------------------------------------------------------------------------
+    # Gerenciamento de Lançamentos Financeiros (Níveis 2 e 4)
+    # -------------------------------------------------------------------------
     def read(self):
         try:
             with open(DB_FILE, "r", encoding="utf-8") as f:
@@ -125,4 +206,3 @@ class DataRecord:
         self.__expenses = [e for e in self.__expenses if e.id != int(expense_id)]
         self.write()
         return True
-

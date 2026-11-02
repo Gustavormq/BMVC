@@ -7,7 +7,7 @@ if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
 from app.controllers.application import Application
-from bottle import Bottle, run, static_file, TEMPLATE_PATH
+from bottle import Bottle, run, request, response, redirect, static_file, TEMPLATE_PATH
 
 views_path = os.path.join(BASE_DIR, 'app', 'views', 'html')
 if views_path not in TEMPLATE_PATH:
@@ -33,12 +33,50 @@ def helper(info=None):
 
 
 #-----------------------------------------------------------------------------
-# Rotas da Aplicação (Páginas e Ações MVC):
+# Rotas de Controle de Acesso e Sessão (Nível 3 e 4):
+
+@app.route('/portal', method='GET')
+def login():
+    return ctl.render('portal')
+
+@app.route('/portal', method='POST')
+def action_portal():
+    username = (request.forms.getunicode('username') or '').strip()
+    password = (request.forms.getunicode('password') or '').strip()
+    session_id, authenticated_username = ctl.authenticate_user(username, password)
+    if session_id:
+        response.set_cookie('session_id', session_id, httponly=True, max_age=3600, path='/')
+        return redirect(f'/despesas/{authenticated_username}')
+    return redirect('/portal?err=Credenciais+inválidas')
+
+@app.route('/register', method='POST')
+def action_register():
+    username = (request.forms.getunicode('username') or '').strip()
+    password = (request.forms.getunicode('password') or '').strip()
+    created = ctl.register_user(username, password)
+    if not created:
+        return redirect('/portal?err=Usuário+já+existe+ou+dados+inválidos')
+    session_id, authenticated_username = ctl.authenticate_user(username, password)
+    if session_id:
+        response.set_cookie('session_id', session_id, httponly=True, max_age=3600, path='/')
+        return redirect(f'/despesas/{authenticated_username}?msg=Conta+criada+e+autenticada+com+sucesso')
+    return redirect('/portal?msg=Conta+criada+com+sucesso')
+
+@app.route('/logout', method='POST')
+def logout():
+    ctl.logout_user()
+    response.delete_cookie('session_id', path='/')
+    return redirect('/portal?msg=Logout+realizado+com+sucesso')
+
+
+#-----------------------------------------------------------------------------
+# Rotas da Aplicação (Páginas e Ações MVC - Níveis 1, 2 e 4):
 
 @app.route('/', method='GET')
 @app.route('/despesas', method='GET')
-def despesas():
-    return ctl.render('despesas')
+@app.route('/despesas/<parameter>', method='GET')
+def despesas(parameter=None):
+    return ctl.render('despesas', parameter=parameter)
 
 @app.route('/add', method='POST')
 def add_expense():
@@ -62,7 +100,7 @@ def export_csv():
 
 
 #-----------------------------------------------------------------------------
-# Rotas de API REST/JSON (Sincronização com o Frontend Interativo):
+# Rotas de API REST/JSON (Sincronização com o Frontend Interativo - Nível 4):
 
 @app.route('/api/transactions', method='GET')
 def api_list():
