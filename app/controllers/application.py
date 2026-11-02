@@ -1,4 +1,12 @@
-from bottle import template
+import os
+from bottle import template, TEMPLATE_PATH
+
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+views_path = os.path.join(BASE_DIR, 'app', 'views', 'html')
+if views_path not in TEMPLATE_PATH:
+    TEMPLATE_PATH.insert(0, views_path)
+if BASE_DIR not in TEMPLATE_PATH:
+    TEMPLATE_PATH.insert(0, BASE_DIR)
 
 
 class Application():
@@ -14,7 +22,7 @@ class Application():
         return content()
 
     def despesas(self):
-        return template('app/views/html/despesas')
+        return template('despesas')
 
     def helper(self):
-        return template('app/views/html/helper')
+        return template('helper')

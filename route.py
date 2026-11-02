@@ -10,6 +10,12 @@ from app.controllers.application import Application
 from bottle import Bottle, route, run, request, static_file
 from bottle import redirect, template, response, TEMPLATE_PATH
 
+views_path = os.path.join(BASE_DIR, 'app', 'views', 'html')
+if views_path not in TEMPLATE_PATH:
+    TEMPLATE_PATH.insert(0, views_path)
+if BASE_DIR not in TEMPLATE_PATH:
+    TEMPLATE_PATH.insert(0, BASE_DIR)
+
 app = Bottle()
 ctl = Application()
 
