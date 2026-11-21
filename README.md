@@ -19,16 +19,19 @@ bmvc_start_from_this/
 ├── docker_install.sh                # Script auxiliar de instalação do Docker
 └── app/
     ├── models/
-    │   └── expense.py               # Model Expense (entidade de lançamento financeiro)
+    │   ├── expense.py               # Model Expense (lançamento financeiro: receita/despesa)
+    │   └── financial_profile.py     # Model FinancialProfile (titular da carteira e orçamento)
     ├── controllers/
-    │   ├── application.py           # Controller Application (regras de negócio e renderização)
-    │   ├── datarecord.py            # Persistência de objetos Expense em banco JSON
+    │   ├── application.py           # Controller Application (regras de negócio, sessão e views)
+    │   ├── datarecord.py            # Persistência de objetos Expense e FinancialProfile em JSON
     │   └── db/
-    │       └── expenses.json        # Base de dados JSON persistente
+    │       ├── expenses.json        # Base de dados JSON de lançamentos
+    │       └── financial_profiles.json # Base de dados JSON de perfis financeiros
     ├── views/
     │   └── html/
-    │       ├── despesas.tpl         # View principal (painel, filtros, tabela e gráficos)
+    │       ├── despesas.tpl         # View principal (painel, filtros, tabela CRUD e gráficos)
     │       ├── editar_despesa.tpl   # View de edição de lançamento
+    │       ├── portal.tpl           # View de login e cadastro de perfil financeiro
     │       └── helper.tpl           # View auxiliar do template BMVC
     └── static/
         ├── css/
