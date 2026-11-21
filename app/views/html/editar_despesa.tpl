@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Lançamento · BMVC Finance</title>
+    <!-- Carregamento do CSS externo obrigatório no BMVC -->
     <link rel="stylesheet" type="text/css" href="/static/css/despesas.css">
 </head>
 <body>
@@ -14,7 +15,7 @@
                 <div class="brand-icon">💰</div>
                 <div>
                     <h1>BMVC Finance</h1>
-                    <p class="subtitle">Editar Lançamento #{{expense.id}}</p>
+                    <p class="subtitle">Editar Lançamento #{{expense.id}} ({{expense.description}})</p>
                 </div>
             </div>
             <div class="header-actions">
@@ -33,31 +34,31 @@
 
         <section class="panel-card">
             <div class="panel-header">
-                <h3>✏️ Editar Lançamento</h3>
+                <h3>✏️ Editar Lançamento #{{expense.id}}</h3>
             </div>
 
-            <form method="POST" action="/edit/{{expense.id}}" class="form-grid">
+            <form id="edit-transaction-form" method="POST" action="/edit/{{expense.id}}" class="form-grid">
                 <div class="form-group">
-                    <label for="type">Tipo</label>
-                    <select id="type" name="type" required>
+                    <label for="edit-type">Tipo</label>
+                    <select id="edit-type" name="type" required>
                         <option value="despesa" {{'selected' if expense.type == 'despesa' else ''}}>Despesa (Saída)</option>
                         <option value="receita" {{'selected' if expense.type == 'receita' else ''}}>Receita (Entrada)</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label for="description">Descrição</label>
-                    <input type="text" id="description" name="description" value="{{expense.description}}" required>
+                    <label for="edit-description">Descrição</label>
+                    <input type="text" id="edit-description" name="description" value="{{expense.description}}" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="amount">Valor (R$)</label>
-                    <input type="number" id="amount" name="amount" step="0.01" min="0.01" value="{{f'{expense.amount:.2f}'}}" required>
+                    <label for="edit-amount">Valor (R$)</label>
+                    <input type="number" id="edit-amount" name="amount" step="0.01" min="0.01" value="{{f'{expense.amount:.2f}'}}" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="category">Categoria</label>
-                    <select id="category" name="category" required>
+                    <label for="edit-category">Categoria</label>
+                    <select id="edit-category" name="category" required>
                         % for c in categories:
                         <option value="{{c}}" {{'selected' if expense.category == c else ''}}>{{c}}</option>
                         % end
@@ -65,8 +66,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="date">Data</label>
-                    <input type="date" id="date" name="date" value="{{expense.date}}" required>
+                    <label for="edit-date">Data</label>
+                    <input type="date" id="edit-date" name="date" value="{{expense.date}}" required>
                 </div>
 
                 <div class="edit-actions">
@@ -82,10 +83,13 @@
 
     </main>
 
+    <div id="toast" class="toast"></div>
+
     <footer class="app-footer">
         <p>Projeto Acadêmico &bull; BMVC Finance &bull; Padrão Arquitetural Model-View-Controller (Bottle)</p>
     </footer>
 
+    <!-- Carregamento do JS externo obrigatório no BMVC -->
+    <script src="/static/js/despesas.js"></script>
 </body>
 </html>
-

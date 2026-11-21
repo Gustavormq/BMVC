@@ -27,13 +27,13 @@
                 </a>
                 % if defined('current_user') and current_user:
                 <div class="header-badge">
-                    <span class="status-dot"></span> 👤 {{current_user.username}}
+                    <span class="status-dot"></span> 👤 {{current_user.username}} (Meta: R$ {{f"{current_user.monthly_budget:.2f}"}})
                 </div>
                 <form action="/logout" method="POST" style="display:inline;">
                     <button type="submit" class="btn btn-sm btn-outline" title="Sair da conta">🚪 Sair</button>
                 </form>
                 % else:
-                <a href="/portal" class="btn btn-sm btn-outline" title="Acessar Portal de Login (Nível 3)">
+                <a href="/portal" class="btn btn-sm btn-outline" title="Acessar Portal de Login">
                     🔐 Login / Portal
                 </a>
                 <div class="header-badge">
@@ -91,7 +91,7 @@
             <!-- Coluna Esquerda: Formulário e Métricas -->
             <div class="left-column">
 
-                <!-- Formulário de Novo Lançamento -->
+                <!-- Formulário de Novo Lançamento (Create) -->
                 <section class="panel-card">
                     <div class="panel-header">
                         <h3>➕ Novo Lançamento</h3>
@@ -135,19 +135,34 @@
                     </form>
                 </section>
 
-                <!-- Distribuição de Despesas por Categoria -->
+                <!-- Distribuição de Despesas por Categoria (Renderizada pelo TPL + Atualizada pelo JS) -->
                 <section class="panel-card">
                     <div class="panel-header">
                         <h3>📊 Gastos por Categoria (%)</h3>
                     </div>
                     <div id="category-bars" class="category-list">
-                        <!-- Gerado via JavaScript -->
+                        % if defined('category_totals') and category_totals and defined('total_expense') and total_expense > 0:
+                            % for cat, amount in sorted(category_totals.items(), key=lambda x: x[1], reverse=True):
+                                % pct = round((amount / total_expense) * 100, 1)
+                                <div class="category-item">
+                                    <div class="cat-item-info">
+                                        <span>{{cat}}</span>
+                                        <span><strong>R$ {{f"{amount:.2f}".replace(".", ",")}}</strong> ({{pct}}%)</span>
+                                    </div>
+                                    <div class="cat-bar-bg">
+                                        <div class="cat-bar-fill" style="width: {{pct}}%;"></div>
+                                    </div>
+                                </div>
+                            % end
+                        % else:
+                            <p style="color: #94a3b8; font-size: 0.85rem; font-style: italic;">Nenhuma despesa registrada.</p>
+                        % end
                     </div>
                 </section>
 
             </div>
 
-            <!-- Coluna Direita: Filtros, Tabela e Gráficos -->
+            <!-- Coluna Direita: Filtros, Tabela CRUD e Gráficos -->
             <div class="right-column">
 
                 <!-- Painel de Filtros Avançados (Data, Categoria, Tipo e Busca) -->
@@ -183,8 +198,9 @@
                         </div>
 
                         <div class="filter-actions">
+                            <button type="submit" class="btn btn-sm btn-outline">Aplicar</button>
                             <button type="button" id="btn-clear-filters" class="btn btn-sm btn-outline">
-                                Limpar Filtros
+                                Limpar
                             </button>
                         </div>
                     </form>
@@ -197,7 +213,7 @@
                     </div>
                 </section>
 
-                <!-- Tabela de Extrato -->
+                <!-- Tabela de Extrato (Servindo diretamente objetos Python Expense no TPL + Sync JS) -->
                 <section class="panel-card">
                     <div class="panel-header extrato-header">
                         <h3>📋 Extrato de Lançamentos</h3>
@@ -217,17 +233,47 @@
                                 </tr>
                             </thead>
                             <tbody id="transaction-table-body">
-                                <!-- Preenchido e sincronizado via JS + API Backend -->
+                                % if defined('expenses') and expenses:
+                                    % for exp in expenses:
+                                    <tr>
+                                        <td>
+                                            % if exp.type == 'receita':
+                                            <span class="badge badge-income">Receita</span>
+                                            % else:
+                                            <span class="badge badge-expense">Despesa</span>
+                                            % end
+                                        </td>
+                                        <td>{{exp.formatted_date}}</td>
+                                        <td><strong>{{exp.description}}</strong></td>
+                                        <td><span class="badge badge-cat">{{exp.category}}</span></td>
+                                        <td style="color: {{'#10b981' if exp.type == 'receita' else '#ef4444'}}; font-weight: 600;">
+                                            {{'+ ' if exp.type == 'receita' else '- '}}R$ {{f"{exp.amount:.2f}".replace(".", ",")}}
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a href="/edit/{{exp.id}}" class="btn-edit" title="Editar lançamento">
+                                                    ✏️ Editar
+                                                </a>
+                                                <form method="POST" action="/delete/{{exp.id}}" style="display:inline;">
+                                                    <button type="submit" class="btn-delete" data-id="{{exp.id}}" title="Excluir lançamento">
+                                                        🗑️ Excluir
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    % end
+                                % end
                             </tbody>
                         </table>
                     </div>
 
-                    <div id="empty-state" class="empty-state hidden">
+                    <div id="empty-state" class="empty-state {{'hidden' if defined('expenses') and expenses else ''}}">
                         <p>Nenhum lançamento encontrado para os filtros selecionados.</p>
                     </div>
                 </section>
 
-                <!-- Gráficos Interativos (Migrados do Expense-Tracker) -->
+                <!-- Gráficos Interativos -->
                 <div class="charts-grid">
                     <section class="panel-card">
                         <div class="panel-header">

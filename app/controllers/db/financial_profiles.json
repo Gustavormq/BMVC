@@ -1,0 +1,14 @@
+[
+    {
+        "username": "gustavo",
+        "password": "123456",
+        "monthly_budget": 3500.0,
+        "currency": "BRL"
+    },
+    {
+        "username": "admin",
+        "password": "123456",
+        "monthly_budget": 5000.0,
+        "currency": "BRL"
+    }
+]
